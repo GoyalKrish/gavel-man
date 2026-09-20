@@ -381,14 +381,16 @@ code, pre, kbd {
   to { transform: rotate(360deg); }
 }
 
-/* Editor */
+/* ==========================================================================
+   Code Editor Container & CodeMirror Custom Theme
+   ========================================================================== */
 .editor-container {
   display: flex;
   flex-direction: column;
 }
 
 .editor-topbar {
-  padding: 8px 18px;
+  padding: 8px 16px;
   background: var(--bg-subtle);
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -397,33 +399,162 @@ code, pre, kbd {
   font-size: 12px;
 }
 
+.editor-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .editor-file {
   font-family: var(--font-mono);
   color: var(--text-primary);
   font-weight: 500;
 }
 
-.editor-hint {
+.editor-compiler-flags code {
+  font-size: 11.5px;
   color: var(--text-muted);
 }
 
-.editor-hint code {
-  color: var(--text-secondary);
+.editor-meta-right {
+  display: flex;
+  align-items: center;
 }
 
+.editor-shortcuts-hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.editor-shortcuts-hint kbd {
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.editor-mount {
+  position: relative;
+  background: #000000;
+}
+
+/* Native Textarea Fallback */
 .code-area {
   width: 100%;
-  height: 280px;
-  background: var(--bg-page);
+  height: 320px;
+  background: #000000;
   border: none;
   color: #f4f4f5;
   font-family: var(--font-mono);
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.65;
   padding: 16px 18px;
   outline: none;
   resize: vertical;
   tab-size: 4;
+}
+
+/* CodeMirror Core Overrides */
+.CodeMirror {
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  line-height: 1.65 !important;
+  height: 320px !important;
+  background: #000000 !important;
+  color: #ededed !important;
+  border: none !important;
+}
+
+.CodeMirror-gutters {
+  background: #09090b !important;
+  border-right: 1px solid var(--border) !important;
+  padding-right: 4px;
+}
+
+.CodeMirror-linenumber {
+  color: #4b4b54 !important;
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  padding: 0 10px 0 8px !important;
+}
+
+.CodeMirror-cursor {
+  border-left: 2px solid #ffffff !important;
+}
+
+.CodeMirror-selected {
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+.CodeMirror-focused .CodeMirror-selected {
+  background: rgba(255, 255, 255, 0.22) !important;
+}
+
+.CodeMirror-matchingbracket {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-bottom: 1px solid #ffffff !important;
+}
+
+/* C++ Syntax Highlighting Tokens */
+.cm-s-the-judge-dark.CodeMirror {
+  background: #000000 !important;
+  color: #e6edf3 !important;
+}
+
+.cm-s-the-judge-dark .cm-keyword {
+  color: #ff7b72;
+  font-weight: 600;
+}
+
+.cm-s-the-judge-dark .cm-def {
+  color: #d2a8ff;
+  font-weight: 500;
+}
+
+.cm-s-the-judge-dark .cm-variable {
+  color: #f0f6fc;
+}
+
+.cm-s-the-judge-dark .cm-variable-2 {
+  color: #79c0ff;
+}
+
+.cm-s-the-judge-dark .cm-variable-3 {
+  color: #7ee787;
+}
+
+.cm-s-the-judge-dark .cm-type {
+  color: #ffa657;
+}
+
+.cm-s-the-judge-dark .cm-number {
+  color: #79c0ff;
+}
+
+.cm-s-the-judge-dark .cm-string {
+  color: #a5d6ff;
+}
+
+.cm-s-the-judge-dark .cm-comment {
+  color: #6e7681;
+  font-style: italic;
+}
+
+.cm-s-the-judge-dark .cm-operator {
+  color: #ff7b72;
+}
+
+.cm-s-the-judge-dark .cm-meta {
+  color: #ff7b72;
+  font-weight: 500;
+}
+
+.cm-s-the-judge-dark .cm-builtin {
+  color: #ffa657;
 }
 
 /* ==========================================================================

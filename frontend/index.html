@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="THE JUDGE — Deterministic algorithmic complexity profiler using Valgrind Callgrind and data-space OLS regression.">
+  <meta name="description"
+    content="THE JUDGE — Deterministic algorithmic complexity profiler using Valgrind Callgrind and data-space OLS regression.">
   <title>THE JUDGE — Complexity Profiler</title>
 
   <!-- High-end Technical Typography: Geist & Geist Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <!-- Code Editor Styles (CodeMirror Core + Custom Theme) -->
+  <link rel="stylesheet" href="./vendor/codemirror/codemirror.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <!-- Top Navigation Bar (No status dots, no capsules) -->
@@ -54,7 +62,7 @@
         <button type="button" class="preset-btn" data-preset="2n/0.cc">Recursive Tree <code>O(2ᴺ)</code></button>
       </div>
 
-      <!-- Workbench (Controls + Editor) -->
+      <!-- Workbench (Controls + CodeMirror Editor) -->
       <div class="workbench">
         <div class="workbench-bar">
           <div class="field-group">
@@ -73,7 +81,8 @@
                 <button type="button" class="size-btn" data-val="256, 512, 1024, 2048, 4096, 8192">256–8192</button>
               </div>
             </div>
-            <input type="text" id="nValuesInput" class="input" value="64, 128, 256, 512" placeholder="e.g. 64, 128, 256, 512">
+            <input type="text" id="nValuesInput" class="input" value="64, 128, 256, 512"
+              placeholder="e.g. 64, 128, 256, 512">
           </div>
 
           <div class="action-wrap">
@@ -85,12 +94,18 @@
           </div>
         </div>
 
+        <!-- Code Editor Area with Line Numbers, Syntax Highlighting & Shortcuts -->
         <div class="editor-container">
           <div class="editor-topbar">
-            <span class="editor-file" id="editorFilename">target_program.cc</span>
-            <span class="editor-hint">Compiled with <code>-O0 -g -fno-omit-frame-pointer</code> • N via <code>argv[1]</code></span>
+            <div class="editor-meta-left">
+              <span class="editor-file" id="editorFilename">target_program.cc</span>
+
+            </div>
+
           </div>
-          <textarea id="codeEditor" class="code-area" spellcheck="false"></textarea>
+          <div class="editor-mount">
+            <textarea id="codeEditor" class="code-area" spellcheck="false"></textarea>
+          </div>
         </div>
       </div>
 
@@ -122,7 +137,7 @@
 
       <!-- Evidence: Chart & Measurement Ledger -->
       <div class="evidence-grid">
-        
+
         <!-- Scaling Curve -->
         <div class="panel">
           <div class="panel-header">
@@ -188,7 +203,8 @@
             <button type="button" class="copy-btn" id="copyLogBtn">Copy</button>
           </summary>
           <div class="trace-box">
-            <pre class="trace-pre" id="consoleLog">Analyzer idle. Select a preset or write code and click Analyze Complexity.</pre>
+            <pre class="trace-pre"
+              id="consoleLog">Analyzer idle. Select a preset or write code and click Analyze Complexity.</pre>
           </div>
         </details>
       </div>
@@ -201,7 +217,8 @@
     <section class="tab-view" id="tab-reports">
       <div class="suite-header">
         <h2 class="suite-title">Benchmark Suite</h2>
-        <span class="suite-stats"><strong id="statScore">27 / 27</strong> verified (<span id="statAccuracy">100%</span> accuracy) across 9 complexity classes</span>
+        <span class="suite-stats"><strong id="statScore">27 / 27</strong> verified (<span id="statAccuracy">100%</span>
+          accuracy) across 9 complexity classes</span>
       </div>
 
       <div class="suite-grid">
@@ -225,7 +242,8 @@
               </thead>
               <tbody id="reportsTableBody">
                 <tr>
-                  <td colspan="6" class="muted" style="text-align: center; padding: 24px;">Loading benchmark records...</td>
+                  <td colspan="6" class="muted" style="text-align: center; padding: 24px;">Loading benchmark records...
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -238,7 +256,8 @@
             <span class="panel-title">reports/summary.txt</span>
           </div>
           <div class="panel-body" style="height: 540px; overflow-y: auto; padding: 0;">
-            <pre class="trace-pre" id="reportsSummaryBox" style="margin: 0; border: none; height: 100%;">Loading summary report...</pre>
+            <pre class="trace-pre" id="reportsSummaryBox"
+              style="margin: 0; border: none; height: 100%;">Loading summary report...</pre>
           </div>
         </div>
       </div>
@@ -254,17 +273,26 @@
         <div class="doc-section">
           <h2>Deterministic Instruction Counting vs. Wall-Clock Noise</h2>
           <p>
-            Standard timing libraries like <code>std::chrono</code> measure elapsed wall-clock seconds, which fluctuate due to CPU frequency scaling, thread preemption, cache warmth, and thermal throttling. These factors distort curve fits and make sub-linear or linearithmic differences difficult to distinguish.
+            Standard timing libraries like <code>std::chrono</code> measure elapsed wall-clock seconds, which fluctuate
+            due to CPU frequency scaling, thread preemption, cache warmth, and thermal throttling. These factors distort
+            curve fits and make sub-linear or linearithmic differences difficult to distinguish.
           </p>
           <p>
-            <strong>THE JUDGE</strong> avoids wall-clock noise by executing binaries inside the <strong>Valgrind Callgrind</strong> virtualized environment, counting the exact number of CPU instruction reads (<code>Ir</code>). With <code>--collect-atstart=no --toggle-collect=main</code>, runtime initialization and dynamic linker steps are bypassed, isolating instructions executed exclusively within <code>main()</code>.
+            <strong>THE JUDGE</strong> avoids wall-clock noise by executing binaries inside the <strong>Valgrind
+              Callgrind</strong> virtualized environment, counting the exact number of CPU instruction reads
+            (<code>Ir</code>). With <code>--collect-atstart=no --toggle-collect=main</code>, runtime initialization and
+            dynamic linker steps are bypassed, isolating instructions executed exclusively within <code>main()</code>.
           </p>
         </div>
 
         <div class="doc-section">
           <h2>Data-Space Ordinary Least Squares (OLS)</h2>
           <p>
-            The profiler fits measurement pairs <code>(N, I(N))</code> to 9 candidate models of the form <code>I(N) = c · f(N) + b</code> directly in data space. Data-space regression preserves fixed additive overhead <i>b</i> without the distortion introduced by logarithmic transformations. Power-law log-log slopes are evaluated concurrently to extract the scaling exponent <i>k</i>, and candidates with non-physical negative coefficients (<code>c &lt; 0</code>) are discarded.
+            The profiler fits measurement pairs <code>(N, I(N))</code> to 9 candidate models of the form
+            <code>I(N) = c · f(N) + b</code> directly in data space. Data-space regression preserves fixed additive
+            overhead <i>b</i> without the distortion introduced by logarithmic transformations. Power-law log-log slopes
+            are evaluated concurrently to extract the scaling exponent <i>k</i>, and candidates with non-physical
+            negative coefficients (<code>c &lt; 0</code>) are discarded.
           </p>
         </div>
 
@@ -281,15 +309,69 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td><code>O(1)</code></td><td><code>1.0</code></td><td class="num">1.000×</td><td class="num">≈ 0.0</td><td>Direct array indexing, hash lookup</td></tr>
-              <tr><td><code>O(log N)</code></td><td><code>log₂(N)</code></td><td class="num">Decays toward 1.000×</td><td class="num">≈ 0.0 – 0.1</td><td>Binary search, tree search</td></tr>
-              <tr><td><code>O(√N)</code></td><td><code>√N</code></td><td class="num">1.414×</td><td class="num">≈ 0.5</td><td>Square root decomposition, prime trial division</td></tr>
-              <tr><td><code>O(N)</code></td><td><code>N</code></td><td class="num">2.000×</td><td class="num">≈ 1.0</td><td>Linear scan, vector accumulation</td></tr>
-              <tr><td><code>O(N log N)</code></td><td><code>N · log₂(N)</code></td><td class="num">&gt; 2.000×</td><td class="num">≈ 1.0 – 1.1</td><td>Merge sort, Quicksort</td></tr>
-              <tr><td><code>O(N²)</code></td><td><code>N²</code></td><td class="num">4.000×</td><td class="num">≈ 2.0</td><td>Bubble sort, nested comparison</td></tr>
-              <tr><td><code>O(N³)</code></td><td><code>N³</code></td><td class="num">8.000×</td><td class="num">≈ 3.0</td><td>Matrix multiplication, Floyd-Warshall</td></tr>
-              <tr><td><code>O(2ᴺ)</code></td><td><code>2ᴺ</code></td><td class="num">Explosive</td><td class="num">Super-polynomial</td><td>Recursive Fibonacci, subset generation</td></tr>
-              <tr><td><code>O(N!)</code></td><td><code>Γ(N + 1)</code></td><td class="num">Explosive</td><td class="num">Super-polynomial</td><td>Permutation generation, TSP brute force</td></tr>
+              <tr>
+                <td><code>O(1)</code></td>
+                <td><code>1.0</code></td>
+                <td class="num">1.000×</td>
+                <td class="num">≈ 0.0</td>
+                <td>Direct array indexing, hash lookup</td>
+              </tr>
+              <tr>
+                <td><code>O(log N)</code></td>
+                <td><code>log₂(N)</code></td>
+                <td class="num">Decays toward 1.000×</td>
+                <td class="num">≈ 0.0 – 0.1</td>
+                <td>Binary search, tree search</td>
+              </tr>
+              <tr>
+                <td><code>O(√N)</code></td>
+                <td><code>√N</code></td>
+                <td class="num">1.414×</td>
+                <td class="num">≈ 0.5</td>
+                <td>Square root decomposition, prime trial division</td>
+              </tr>
+              <tr>
+                <td><code>O(N)</code></td>
+                <td><code>N</code></td>
+                <td class="num">2.000×</td>
+                <td class="num">≈ 1.0</td>
+                <td>Linear scan, vector accumulation</td>
+              </tr>
+              <tr>
+                <td><code>O(N log N)</code></td>
+                <td><code>N · log₂(N)</code></td>
+                <td class="num">&gt; 2.000×</td>
+                <td class="num">≈ 1.0 – 1.1</td>
+                <td>Merge sort, Quicksort</td>
+              </tr>
+              <tr>
+                <td><code>O(N²)</code></td>
+                <td><code>N²</code></td>
+                <td class="num">4.000×</td>
+                <td class="num">≈ 2.0</td>
+                <td>Bubble sort, nested comparison</td>
+              </tr>
+              <tr>
+                <td><code>O(N³)</code></td>
+                <td><code>N³</code></td>
+                <td class="num">8.000×</td>
+                <td class="num">≈ 3.0</td>
+                <td>Matrix multiplication, Floyd-Warshall</td>
+              </tr>
+              <tr>
+                <td><code>O(2ᴺ)</code></td>
+                <td><code>2ᴺ</code></td>
+                <td class="num">Explosive</td>
+                <td class="num">Super-polynomial</td>
+                <td>Recursive Fibonacci, subset generation</td>
+              </tr>
+              <tr>
+                <td><code>O(N!)</code></td>
+                <td><code>Γ(N + 1)</code></td>
+                <td class="num">Explosive</td>
+                <td class="num">Super-polynomial</td>
+                <td>Permutation generation, TSP brute force</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -311,6 +393,14 @@
     </div>
   </div>
 
+  <!-- CodeMirror Code Editor Script Files -->
+  <script src="./vendor/codemirror/codemirror.min.js"></script>
+  <script src="./vendor/codemirror/clike.min.js"></script>
+  <script src="./vendor/codemirror/matchbrackets.min.js"></script>
+  <script src="./vendor/codemirror/closebrackets.min.js"></script>
+  <script src="./vendor/codemirror/comment.min.js"></script>
+
   <script src="app.js"></script>
 </body>
+
 </html>

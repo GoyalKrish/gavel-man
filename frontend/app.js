@@ -1,6 +1,6 @@
 /**
  * THE JUDGE — Empirical Computational Workbench
- * Clean, Engineered Frontend Logic (Vercel/Geist Design System)
+ * Clean, Engineered Frontend Logic (Vercel/Geist Design System + CodeMirror)
  */
 
 // Application State
@@ -14,6 +14,9 @@ const state = {
   serverOnline: false,
   reportsData: null
 };
+
+// Global CodeMirror instance
+let codeMirrorEditor = null;
 
 // Built-in presets with full empirical datasets for instant exploration
 const presetLibrary = {
@@ -281,7 +284,7 @@ const classDisplayNames = {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   setupTabs();
-  setupEditor();
+  setupCodeMirror();
   setupPresetShortcuts();
   setupSizeShortcuts();
   setupScaleToggles();
@@ -293,6 +296,77 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load default preset
   loadPresetData('nn/0.cc');
 });
+
+// Setup CodeMirror with C++ mode, line numbers, and shortcuts
+function setupCodeMirror() {
+  const codeArea = document.getElementById('codeEditor');
+  if (codeArea && window.CodeMirror) {
+    codeMirrorEditor = CodeMirror.fromTextArea(codeArea, {
+      mode: 'text/x-c++src',
+      theme: 'the-judge-dark',
+      lineNumbers: true,
+      lineWrapping: false,
+      tabSize: 4,
+      indentUnit: 4,
+      indentWithTabs: false,
+      matchBrackets: true,
+      autoCloseBrackets: true,
+      extraKeys: {
+        'Tab': (cm) => {
+          if (cm.somethingSelected()) {
+            cm.indentSelection('add');
+          } else {
+            cm.replaceSelection('    ', 'end');
+          }
+        },
+        'Shift-Tab': (cm) => {
+          cm.indentSelection('subtract');
+        },
+        'Cmd-Enter': () => {
+          executeAnalysis();
+        },
+        'Ctrl-Enter': () => {
+          executeAnalysis();
+        },
+        'Cmd-/': 'toggleComment',
+        'Ctrl-/': 'toggleComment'
+      }
+    });
+
+    codeMirrorEditor.setSize('100%', '320px');
+  }
+
+  const presetSelect = document.getElementById('presetSelect');
+  if (presetSelect) {
+    presetSelect.addEventListener('change', async (e) => {
+      const path = e.target.value;
+      if (!path) return;
+      if (presetLibrary[path]) {
+        loadPresetData(path);
+      } else {
+        await loadProgramSource(path);
+      }
+    });
+  }
+}
+
+function getCodeContent() {
+  if (codeMirrorEditor) {
+    return codeMirrorEditor.getValue();
+  }
+  const codeArea = document.getElementById('codeEditor');
+  return codeArea ? codeArea.value : '';
+}
+
+function setCodeContent(code) {
+  if (codeMirrorEditor) {
+    codeMirrorEditor.setValue(code);
+    codeMirrorEditor.clearHistory();
+  } else {
+    const codeArea = document.getElementById('codeEditor');
+    if (codeArea) codeArea.value = code;
+  }
+}
 
 // Tabs
 function setupTabs() {
@@ -316,27 +390,16 @@ function setupTabs() {
       if (targetTab === 'reports' && !state.reportsData) {
         loadReports();
       }
-      if (targetTab === 'analyzer' && state.lastMeasurements.length > 0) {
-        setTimeout(renderChart, 50);
+      if (targetTab === 'analyzer') {
+        if (codeMirrorEditor) {
+          setTimeout(() => codeMirrorEditor.refresh(), 20);
+        }
+        if (state.lastMeasurements.length > 0) {
+          setTimeout(renderChart, 50);
+        }
       }
     });
   });
-}
-
-// Editor & Program Select
-function setupEditor() {
-  const presetSelect = document.getElementById('presetSelect');
-  if (presetSelect) {
-    presetSelect.addEventListener('change', async (e) => {
-      const path = e.target.value;
-      if (!path) return;
-      if (presetLibrary[path]) {
-        loadPresetData(path);
-      } else {
-        await loadProgramSource(path);
-      }
-    });
-  }
 }
 
 // Preset Buttons
@@ -361,12 +424,11 @@ function loadPresetData(presetKey) {
 
   state.currentProgramPath = presetKey;
 
-  const codeArea = document.getElementById('codeEditor');
   const filenameLabel = document.getElementById('editorFilename');
   const nInput = document.getElementById('nValuesInput');
   const select = document.getElementById('presetSelect');
 
-  if (codeArea) codeArea.value = preset.code;
+  setCodeContent(preset.code);
   if (filenameLabel) filenameLabel.textContent = preset.filename;
   if (nInput) nInput.value = preset.nDefault;
   if (select) select.value = presetKey;
@@ -510,11 +572,10 @@ async function loadProgramSource(path) {
     const res = await fetch(`/api/programs?path=${encodeURIComponent(path)}`);
     if (!res.ok) return;
     const data = await res.json();
-    const codeArea = document.getElementById('codeEditor');
     const filenameLabel = document.getElementById('editorFilename');
     const select = document.getElementById('presetSelect');
 
-    if (codeArea) codeArea.value = data.code;
+    setCodeContent(data.code);
     if (filenameLabel) filenameLabel.textContent = path;
     if (select) select.value = path;
 
@@ -550,10 +611,9 @@ function setupAnalyzerActions() {
 async function executeAnalysis() {
   if (state.isAnalyzing) return;
 
-  const codeArea = document.getElementById('codeEditor');
+  const code = getCodeContent();
   const nInput = document.getElementById('nValuesInput');
 
-  const code = codeArea ? codeArea.value : '';
   const rawN = nInput ? nInput.value : '64, 128, 256, 512';
   const nValues = rawN
     .split(/[\s,]+/)
@@ -906,7 +966,8 @@ async function viewDetailedReport(programPath) {
 
 // Window resize
 window.addEventListener('resize', () => {
-  if (state.currentTab === 'analyzer' && state.lastMeasurements.length > 0) {
-    renderChart();
+  if (state.currentTab === 'analyzer') {
+    if (codeMirrorEditor) codeMirrorEditor.refresh();
+    if (state.lastMeasurements.length > 0) renderChart();
   }
 });

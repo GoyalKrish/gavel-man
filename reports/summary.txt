@@ -2,79 +2,52 @@
  COMPLEXITY ANALYZER - TEST SUMMARY
 ==============================================================================
 
-  Date          : 2026-09-20 18:23:23
+  Date          : 2026-09-20 18:56:16
   Programs dir  : programs
   Analyzer      : ./complexity_profiler
   N values      : 0 (base case), 64, 128, 256, 512, 1024, 2048, 4096
-  Total runtime : 3793.8 s
+  Total runtime : 1973.1 s
 
 ------------------------------------------------------------------------------
  SCORE
 ------------------------------------------------------------------------------
-  Correct  : 16 / 21
-  Wrong    : 1
-  Errors   : 4   (compile failure, analyzer crash, timeout, unparsable output)
-  Accuracy : 76.19 %
+  Correct  : 4 / 6
+  Wrong    : 0
+  Errors   : 2   (compile failure, analyzer crash, timeout, unparsable output)
+  Accuracy : 66.67 %
 
 ------------------------------------------------------------------------------
  PER COMPLEXITY CLASS
 ------------------------------------------------------------------------------
   Expected        Correct   Wrong  Errors   Total   Accuracy
-  O(log N)              3       0       0       3     100.0%
-  O(sqrt N)             3       0       0       3     100.0%
-  O(N)                  3       0       0       3     100.0%
-  O(N log N)            3       0       0       3     100.0%
   O(N^2)                3       0       0       3     100.0%
   O(N^3)                1       0       2       3      33.3%
-  O(2^N)                0       1       2       3       0.0%
 
 ------------------------------------------------------------------------------
  CONFUSION MATRIX  (rows = expected, columns = analyzer's answer)
 ------------------------------------------------------------------------------
-  expected \ got    O(log N)   O(sqrt N)        O(N)  O(N log N)      O(N^2)      O(N^3)      O(2^N)       ERROR
-  O(log N)                 3           .           .           .           .           .           .           .
-  O(sqrt N)                .           3           .           .           .           .           .           .
-  O(N)                     .           .           3           .           .           .           .           .
-  O(N log N)               .           .           .           3           .           .           .           .
-  O(N^2)                   .           .           .           .           3           .           .           .
-  O(N^3)                   .           .           .           .           .           1           .           2
-  O(2^N)                   .           .           1           .           .           .           .           2
+  expected \ got  O(N^2)  O(N^3)   ERROR
+  O(N^2)               3       .       .
+  O(N^3)               .       1       2
 
 ------------------------------------------------------------------------------
  WRONG ANSWERS
 ------------------------------------------------------------------------------
-  2n/1.cc              expected O(2^N), analyzer said O(N)
+  (none)
 
 ------------------------------------------------------------------------------
  ERRORS
 ------------------------------------------------------------------------------
   nnn/0.cc             Analyzer timed out after 900 s
   nnn/2.cc             Analyzer timed out after 900 s
-  2n/0.cc              Analyzer timed out after 900 s
-  2n/2.cc              Analyzer timed out after 900 s
 
 ------------------------------------------------------------------------------
  ALL RESULTS
 ------------------------------------------------------------------------------
-  [PASS ] logn/0.cc            expected O(log N)    got O(log N)
-  [PASS ] logn/1.cc            expected O(log N)    got O(log N)
-  [PASS ] logn/2.cc            expected O(log N)    got O(log N)
-  [PASS ] sqrt_n/0.cc          expected O(sqrt N)   got O(sqrt N)
-  [PASS ] sqrt_n/1.cc          expected O(sqrt N)   got O(sqrt N)
-  [PASS ] sqrt_n/2.cc          expected O(sqrt N)   got O(sqrt N)
-  [PASS ] n/0.cc               expected O(N)        got O(N)
-  [PASS ] n/1.cc               expected O(N)        got O(N)
-  [PASS ] n/2.cc               expected O(N)        got O(N)
-  [PASS ] nlogn/0.cc           expected O(N log N)  got O(N log N)
-  [PASS ] nlogn/1.cc           expected O(N log N)  got O(N log N)
-  [PASS ] nlogn/2.cc           expected O(N log N)  got O(N log N)
   [PASS ] nn/0.cc              expected O(N^2)      got O(N^2)
   [PASS ] nn/1.cc              expected O(N^2)      got O(N^2)
   [PASS ] nn/2.cc              expected O(N^2)      got O(N^2)
   [ERROR] nnn/0.cc             expected O(N^3)      got -
   [PASS ] nnn/1.cc             expected O(N^3)      got O(N^3)
   [ERROR] nnn/2.cc             expected O(N^3)      got -
-  [ERROR] 2n/0.cc              expected O(2^N)      got -
-  [FAIL ] 2n/1.cc              expected O(2^N)      got O(N)
-  [ERROR] 2n/2.cc              expected O(2^N)      got -
 
