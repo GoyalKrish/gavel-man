@@ -1,0 +1,7 @@
+.git
+__pycache__
+frontend/__pycache__
+temporary/
+valgrind_local/
+tester
+*.o
