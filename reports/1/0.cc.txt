@@ -1,0 +1,169 @@
+==============================================================================
+ PROGRAM REPORT: 1/0.cc
+==============================================================================
+
+  Source file        : /home/krish/Documents/Projects/THE_JUDGE/programs/1/0.cc
+  Folder             : 1
+  Expected (truth)   : O(1)
+  Analyzer answered  : O(1)
+  Result             : PASS
+  Time taken         : 2.7 s
+  N values requested : 0 (base case), 64, 128, 256, 512, 1024, 2048, 4096
+
+------------------------------------------------------------------------------
+ 1. BASE CASE (N = 0)
+------------------------------------------------------------------------------
+  IR(0) = 1,839   <- fixed cost of the program at N = 0 (setup, argument parsing, ...)
+
+------------------------------------------------------------------------------
+ 2. HOW IR SCALES ACROSS N
+------------------------------------------------------------------------------
+          N               IR       IR - IR(0)         delta IR     ratio  expected     dev %  local k
+  -----------------------------------------------------------------------------------------------------
+   0 (base)            1,839                0                -         -         -         -        -
+         64            1,855               16               16         -         -         -        -
+        128            1,874               35               19     1.010     1.000       1.0    0.015
+        256            1,874               35                0     1.000     1.000       0.0    0.000
+        512            1,874               35                0     1.000     1.000       0.0    0.000
+       1024            1,893               54               19     1.010     1.000       1.0    0.015
+       2048            1,893               54                0     1.000     1.000       0.0    0.000
+       4096            1,893               54                0     1.000     1.000       0.0    0.000
+
+  Legend:
+    IR - IR(0) : instructions above the N = 0 base case (fixed overhead removed)
+    delta IR   : increase over the previous row (first row: increase over base case)
+    ratio      : IR(N) / IR(previous N)
+    expected   : the ratio a pure O(1) program would show for that step
+    dev %      : how far the observed ratio is from the expected one
+    local k    : log(ratio) / log(N / previous N)  (local growth exponent:
+                 ~0 constant, ~1 linear, ~2 quadratic, ~3 cubic)
+
+------------------------------------------------------------------------------
+ 3. NORMALISED IR (flat column = matching growth rate)
+------------------------------------------------------------------------------
+          N           IR/N   IR/(N*log2N)         IR/N^2             IR/[1]
+  --------------------------------------------------------------------------
+         64         28.984         4.8307        0.45288               1855
+        128         14.641         2.0915        0.11438               1874
+        256         7.3203        0.91504       0.028595               1874
+        512         3.6602        0.40668      0.0071487               1874
+       1024         1.8486        0.18486      0.0018053               1893
+       2048        0.92432       0.084029     0.00045133               1893
+       4096        0.46216       0.038513     0.00011283               1893
+
+  Flatness of IR/[1] over the last 4 points: max/min = 1.010   (1.000 = perfectly flat = the expected class fits well)
+
+------------------------------------------------------------------------------
+ 4. GROWTH SUMMARY
+------------------------------------------------------------------------------
+  Base case IR(0)                     : 1,839
+  N range                             : 64 -> 4096  (x64.0)
+  IR growth over that range           : x1.020
+  Growth a pure O(1) would show       : x1.000
+  Geometric-mean step ratio           : 1.003
+  Overall log-log slope               : 0.005
+  Analyzer power-law exponent k       : 0.0047
+  Analyzer power-law R^2              : 0.8430
+  Analyzer interpretation             : Instruction count is approximately constant.
+
+------------------------------------------------------------------------------
+ 5. FINAL VERDICT
+------------------------------------------------------------------------------
+  Expected : O(1)
+  Got      : O(1)
+  Verdict  : CORRECT
+
+------------------------------------------------------------------------------
+ RAW ANALYZER OUTPUT
+------------------------------------------------------------------------------
+
+========================================
+     Empirical Complexity Profiler
+========================================
+
+Source:
+  /home/krish/Documents/Projects/THE_JUDGE/programs/1/0.cc
+
+Compiler:
+  g++
+
+Measurement:
+  Callgrind event: Ir (executed instructions)
+  Collection starts at main()
+  Startup/runtime overhead is excluded as much as Callgrind permits
+  Optimization: -O0
+
+Compiling target...
+  $ g++ -O0 -g -fno-omit-frame-pointer '/home/krish/Documents/Projects/THE_JUDGE/programs/1/0.cc' -o '/tmp/complexity_profiler_30777/target' 2>&1
+
+Running measurements...
+
+N = 64
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_30777/callgrind_64.out' '/tmp/complexity_profiler_30777/target' 64 > /dev/null 2>&1
+  Instructions = 1855
+
+N = 128
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_30777/callgrind_128.out' '/tmp/complexity_profiler_30777/target' 128 > /dev/null 2>&1
+  Instructions = 1874
+
+N = 256
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_30777/callgrind_256.out' '/tmp/complexity_profiler_30777/target' 256 > /dev/null 2>&1
+  Instructions = 1874
+
+N = 512
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_30777/callgrind_512.out' '/tmp/complexity_profiler_30777/target' 512 > /dev/null 2>&1
+  Instructions = 1874
+
+N = 1024
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_30777/callgrind_1024.out' '/tmp/complexity_profiler_30777/target' 1024 > /dev/null 2>&1
+  Instructions = 1893
+
+N = 2048
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_30777/callgrind_2048.out' '/tmp/complexity_profiler_30777/target' 2048 > /dev/null 2>&1
+  Instructions = 1893
+
+N = 4096
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_30777/callgrind_4096.out' '/tmp/complexity_profiler_30777/target' 4096 > /dev/null 2>&1
+  Instructions = 1893
+
+
+========================================
+              Measurements
+========================================
+
+N              Instructions        I(2N)/I(N)          
+-------------------------------------------------------
+64             1855                -                   
+128            1874                1.010               
+256            1874                1.000               
+512            1874                1.000               
+1024           1893                1.010               
+2048           1893                1.000               
+4096           1893                1.000               
+
+========================================
+                Analysis
+========================================
+
+Estimated power-law exponent:
+  k = 0.0047
+
+Power-law R^2:
+  0.8430
+
+Likely time complexity:
+  O(1)
+
+Interpretation:
+  Instruction count is approximately constant.
+
+Temporary files:
+  /tmp/complexity_profiler_30777
+
+NOTE:
+  This is an empirical estimate, not a mathematical proof.
+  The program must actually use N in a meaningful way.
+  Library calls made by the program are included while main()
+  is being profiled, which is important for operations such as sort().
+
+Done.
