@@ -7,7 +7,7 @@
   Expected (truth)   : O(N^3)
   Analyzer answered  : (no answer)
   Result             : ERROR
-  Time taken         : 900.9 s
+  Time taken         : 900.4 s
   N values requested : 0 (base case), 64, 128, 256, 512, 1024, 2048, 4096
 
 ------------------------------------------------------------------------------

@@ -1,10 +1,10 @@
 ==============================================================================
- PROGRAM REPORT: 2n/0.cc
+ PROGRAM REPORT: nfact/1.cc
 ==============================================================================
 
-  Source file        : /home/krish/Documents/Projects/THE_JUDGE/programs/2n/0.cc
-  Folder             : 2n
-  Expected (truth)   : O(2^N)
+  Source file        : /home/krish/Documents/Projects/THE_JUDGE/programs/nfact/1.cc
+  Folder             : nfact
+  Expected (truth)   : O(N!)
   Analyzer answered  : (no answer)
   Result             : ERROR
   Time taken         : 900.4 s
@@ -13,7 +13,7 @@
 ------------------------------------------------------------------------------
  1. BASE CASE (N = 0)
 ------------------------------------------------------------------------------
-  IR(0) = 935   <- fixed cost of the program at N = 0 (setup, argument parsing, ...)
+  IR(0) = 890   <- fixed cost of the program at N = 0 (setup, argument parsing, ...)
 
 ------------------------------------------------------------------------------
  2. HOW IR SCALES ACROSS N
@@ -23,7 +23,7 @@
 ------------------------------------------------------------------------------
  4. GROWTH SUMMARY
 ------------------------------------------------------------------------------
-  Base case IR(0)                     : 935
+  Base case IR(0)                     : 890
 
 ------------------------------------------------------------------------------
  5. FINAL VERDICT

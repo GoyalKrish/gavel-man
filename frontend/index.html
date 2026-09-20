@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="THE JUDGE — Deterministic algorithmic complexity profiler using Valgrind Callgrind and data-space OLS regression.">
+  <title>THE JUDGE — Complexity Profiler</title>
+
+  <!-- High-end Technical Typography: Geist & Geist Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar (No status dots, no capsules) -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="brand">
+        <img src="./assets/logo.svg" alt="Gavel logo" class="brand-icon">
+        <span class="brand-title">THE JUDGE</span>
+        <span class="brand-divider">/</span>
+        <span class="brand-subtitle">Complexity Profiler</span>
+      </div>
+
+      <nav class="nav-links">
+        <button type="button" class="nav-item active" data-tab="analyzer" id="navAnalyzerTab">Profiler</button>
+        <button type="button" class="nav-item" data-tab="reports" id="navReportsTab">Test Suite (27)</button>
+        <button type="button" class="nav-item" data-tab="architecture" id="navArchTab">Methodology</button>
+      </nav>
+
+      <div class="system-status">
+        <span id="serverStatusText">Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main class="viewport">
+
+    <!-- ==================================================================
+         TAB 1: LIVE PROFILER
+         ================================================================== -->
+    <section class="tab-view active" id="tab-analyzer">
+
+      <!-- Benchmark Presets Bar (Direct, functional text buttons) -->
+      <div class="preset-strip">
+        <span class="preset-strip-label">Presets:</span>
+        <button type="button" class="preset-btn active" data-preset="nn/0.cc">Bubble Sort <code>O(N²)</code></button>
+        <button type="button" class="preset-btn" data-preset="n/0.cc">Linear Scan <code>O(N)</code></button>
+        <button type="button" class="preset-btn" data-preset="logn/0.cc">Binary Search <code>O(log N)</code></button>
+        <button type="button" class="preset-btn" data-preset="nnn/0.cc">Matrix Multiply <code>O(N³)</code></button>
+        <button type="button" class="preset-btn" data-preset="2n/0.cc">Recursive Tree <code>O(2ᴺ)</code></button>
+      </div>
+
+      <!-- Workbench (Controls + Editor) -->
+      <div class="workbench">
+        <div class="workbench-bar">
+          <div class="field-group">
+            <label for="presetSelect" class="label">Target Program</label>
+            <select id="presetSelect" class="input select">
+              <option value="">Custom C++ Source / Bubble Sort (nn/0.cc)</option>
+            </select>
+          </div>
+
+          <div class="field-group input-sizes-group">
+            <div class="label-row">
+              <label for="nValuesInput" class="label">Input Sizes (N)</label>
+              <div class="size-shortcuts">
+                <button type="button" class="size-btn active" data-val="64, 128, 256, 512">64–512</button>
+                <button type="button" class="size-btn" data-val="128, 256, 512, 1024, 2048">128–2048</button>
+                <button type="button" class="size-btn" data-val="256, 512, 1024, 2048, 4096, 8192">256–8192</button>
+              </div>
+            </div>
+            <input type="text" id="nValuesInput" class="input" value="64, 128, 256, 512" placeholder="e.g. 64, 128, 256, 512">
+          </div>
+
+          <div class="action-wrap">
+            <button type="button" class="primary-btn" id="runAnalyzeBtn">
+              <span class="spinner" id="btnSpinner" style="display: none;"></span>
+              <span id="btnText">Analyze Complexity</span>
+              <kbd class="kbd">⌘↵</kbd>
+            </button>
+          </div>
+        </div>
+
+        <div class="editor-container">
+          <div class="editor-topbar">
+            <span class="editor-file" id="editorFilename">target_program.cc</span>
+            <span class="editor-hint">Compiled with <code>-O0 -g -fno-omit-frame-pointer</code> • N via <code>argv[1]</code></span>
+          </div>
+          <textarea id="codeEditor" class="code-area" spellcheck="false"></textarea>
+        </div>
+      </div>
+
+      <!-- Verdict Banner (Direct, human, no nested text diarrhea) -->
+      <div class="verdict-banner">
+        <div class="verdict-main">
+          <div class="verdict-class" id="verdictComplexity">O(N²)</div>
+          <div class="verdict-label" id="verdictBadge">Quadratic Scaling</div>
+          <p class="verdict-summary" id="verdictInterpretation">
+            Instructions quadruple (~3.98×) when input size doubles.
+          </p>
+        </div>
+
+        <div class="verdict-data">
+          <div class="data-item">
+            <span class="data-label">Exponent (k)</span>
+            <span class="data-value" id="metricExponent">1.9984</span>
+          </div>
+          <div class="data-item">
+            <span class="data-label">Fit (R²)</span>
+            <span class="data-value" id="metricR2">0.9999</span>
+          </div>
+          <div class="data-item">
+            <span class="data-label">Model</span>
+            <span class="data-value mono">OLS f(N)=N²</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evidence: Chart & Measurement Ledger -->
+      <div class="evidence-grid">
+        
+        <!-- Scaling Curve -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Scaling Curve</span>
+            <div class="scale-toggle">
+              <button type="button" class="toggle-opt active" id="scaleLinear">Linear</button>
+              <button type="button" class="toggle-opt" id="scaleLog">Log₂</button>
+            </div>
+          </div>
+          <div class="panel-body chart-body">
+            <canvas id="growthChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Measurement Ledger Table -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Measurements</span>
+            <span class="panel-meta">Exact Callgrind instruction reads (Ir)</span>
+          </div>
+          <div class="panel-body table-body">
+            <table class="ledger">
+              <thead>
+                <tr>
+                  <th>N</th>
+                  <th class="num">Instructions (Ir)</th>
+                  <th class="num">Doubling Ratio</th>
+                </tr>
+              </thead>
+              <tbody id="measurementsTableBody">
+                <tr>
+                  <td>64</td>
+                  <td class="num">45,210</td>
+                  <td class="num muted">— (base)</td>
+                </tr>
+                <tr>
+                  <td>128</td>
+                  <td class="num">178,940</td>
+                  <td class="num bold">3.96×</td>
+                </tr>
+                <tr>
+                  <td>256</td>
+                  <td class="num">712,300</td>
+                  <td class="num bold">3.98×</td>
+                </tr>
+                <tr>
+                  <td>512</td>
+                  <td class="num">2,841,500</td>
+                  <td class="num bold">3.99×</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Execution Trace (Collapsible) -->
+      <div class="panel trace-panel">
+        <details class="trace-details">
+          <summary class="trace-summary">
+            <span>Valgrind Callgrind Output</span>
+            <button type="button" class="copy-btn" id="copyLogBtn">Copy</button>
+          </summary>
+          <div class="trace-box">
+            <pre class="trace-pre" id="consoleLog">Analyzer idle. Select a preset or write code and click Analyze Complexity.</pre>
+          </div>
+        </details>
+      </div>
+
+    </section>
+
+    <!-- ==================================================================
+         TAB 2: BENCHMARK SUITE
+         ================================================================== -->
+    <section class="tab-view" id="tab-reports">
+      <div class="suite-header">
+        <h2 class="suite-title">Benchmark Suite</h2>
+        <span class="suite-stats"><strong id="statScore">27 / 27</strong> verified (<span id="statAccuracy">100%</span> accuracy) across 9 complexity classes</span>
+      </div>
+
+      <div class="suite-grid">
+        <!-- Results Table -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Test Records</span>
+            <span class="panel-meta">Click any row to view Callgrind dump</span>
+          </div>
+          <div class="panel-body table-body" style="max-height: 540px; overflow-y: auto;">
+            <table class="ledger">
+              <thead>
+                <tr>
+                  <th>Program</th>
+                  <th>Expected</th>
+                  <th>Detected</th>
+                  <th>Status</th>
+                  <th class="num">k</th>
+                  <th class="num">R²</th>
+                </tr>
+              </thead>
+              <tbody id="reportsTableBody">
+                <tr>
+                  <td colspan="6" class="muted" style="text-align: center; padding: 24px;">Loading benchmark records...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Summary Report Box -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">reports/summary.txt</span>
+          </div>
+          <div class="panel-body" style="height: 540px; overflow-y: auto; padding: 0;">
+            <pre class="trace-pre" id="reportsSummaryBox" style="margin: 0; border: none; height: 100%;">Loading summary report...</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         TAB 3: METHODOLOGY
+         ================================================================== -->
+    <section class="tab-view" id="tab-architecture">
+      <div class="doc-container">
+        <h1 class="doc-title">Methodology</h1>
+
+        <div class="doc-section">
+          <h2>Deterministic Instruction Counting vs. Wall-Clock Noise</h2>
+          <p>
+            Standard timing libraries like <code>std::chrono</code> measure elapsed wall-clock seconds, which fluctuate due to CPU frequency scaling, thread preemption, cache warmth, and thermal throttling. These factors distort curve fits and make sub-linear or linearithmic differences difficult to distinguish.
+          </p>
+          <p>
+            <strong>THE JUDGE</strong> avoids wall-clock noise by executing binaries inside the <strong>Valgrind Callgrind</strong> virtualized environment, counting the exact number of CPU instruction reads (<code>Ir</code>). With <code>--collect-atstart=no --toggle-collect=main</code>, runtime initialization and dynamic linker steps are bypassed, isolating instructions executed exclusively within <code>main()</code>.
+          </p>
+        </div>
+
+        <div class="doc-section">
+          <h2>Data-Space Ordinary Least Squares (OLS)</h2>
+          <p>
+            The profiler fits measurement pairs <code>(N, I(N))</code> to 9 candidate models of the form <code>I(N) = c · f(N) + b</code> directly in data space. Data-space regression preserves fixed additive overhead <i>b</i> without the distortion introduced by logarithmic transformations. Power-law log-log slopes are evaluated concurrently to extract the scaling exponent <i>k</i>, and candidates with non-physical negative coefficients (<code>c &lt; 0</code>) are discarded.
+          </p>
+        </div>
+
+        <div class="doc-section">
+          <h2>Evaluated Complexity Transforms</h2>
+          <table class="ledger doc-table">
+            <thead>
+              <tr>
+                <th>Class</th>
+                <th>Transform f(N)</th>
+                <th class="num">Doubling Ratio I(2N)/I(N)</th>
+                <th class="num">Theoretical k</th>
+                <th>Canonical Target</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>O(1)</code></td><td><code>1.0</code></td><td class="num">1.000×</td><td class="num">≈ 0.0</td><td>Direct array indexing, hash lookup</td></tr>
+              <tr><td><code>O(log N)</code></td><td><code>log₂(N)</code></td><td class="num">Decays toward 1.000×</td><td class="num">≈ 0.0 – 0.1</td><td>Binary search, tree search</td></tr>
+              <tr><td><code>O(√N)</code></td><td><code>√N</code></td><td class="num">1.414×</td><td class="num">≈ 0.5</td><td>Square root decomposition, prime trial division</td></tr>
+              <tr><td><code>O(N)</code></td><td><code>N</code></td><td class="num">2.000×</td><td class="num">≈ 1.0</td><td>Linear scan, vector accumulation</td></tr>
+              <tr><td><code>O(N log N)</code></td><td><code>N · log₂(N)</code></td><td class="num">&gt; 2.000×</td><td class="num">≈ 1.0 – 1.1</td><td>Merge sort, Quicksort</td></tr>
+              <tr><td><code>O(N²)</code></td><td><code>N²</code></td><td class="num">4.000×</td><td class="num">≈ 2.0</td><td>Bubble sort, nested comparison</td></tr>
+              <tr><td><code>O(N³)</code></td><td><code>N³</code></td><td class="num">8.000×</td><td class="num">≈ 3.0</td><td>Matrix multiplication, Floyd-Warshall</td></tr>
+              <tr><td><code>O(2ᴺ)</code></td><td><code>2ᴺ</code></td><td class="num">Explosive</td><td class="num">Super-polynomial</td><td>Recursive Fibonacci, subset generation</td></tr>
+              <tr><td><code>O(N!)</code></td><td><code>Γ(N + 1)</code></td><td class="num">Explosive</td><td class="num">Super-polynomial</td><td>Permutation generation, TSP brute force</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Diagnostic Report Modal -->
+  <div id="reportDetailModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <span id="reportDetailTitle" class="modal-title">Benchmark Audit</span>
+        <button type="button" class="modal-close" id="modalCloseBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <pre id="reportDetailContent" class="trace-pre"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

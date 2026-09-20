@@ -1,4 +1,8 @@
 // O(N^3) — naive matrix multiplication
+//
+// Uses the full N provided as input.  Note: at N=4096 this would be
+// ~68 billion iterations which will timeout under Callgrind.
+// Run with smaller N values: --ns 32,64,128,256,512
 #include <cstdlib>
 
 volatile long long sink;
@@ -8,9 +12,9 @@ int main(int argc, char* argv[]) {
     if (n <= 0) return 0;
 
     // Allocate three n×n matrices (flat arrays).
-    int* A = new int[n * n];
-    int* B = new int[n * n];
-    int* C = new int[n * n];
+    long long* A = new long long[n * n];
+    long long* B = new long long[n * n];
+    long long* C = new long long[n * n];
 
     // Initialise A and B with simple values.
     for (int i = 0; i < n * n; ++i) {
@@ -24,8 +28,8 @@ int main(int argc, char* argv[]) {
         for (int j = 0; j < n; ++j) {
             long long s = 0;
             for (int k = 0; k < n; ++k)
-                s += (long long)A[i * n + k] * B[k * n + j];
-            C[i * n + j] = (int)s;
+                s += A[i * n + k] * B[k * n + j];
+            C[i * n + j] = s;
         }
 
     sink = C[0];

@@ -88,31 +88,59 @@ static long double mean(const vector<long double>& values) {
 }
 
 /*
- * Fits:
+ * Compute the model-specific transform f(N) for a given N.
  *
- *     log(I) = a + b * x
+ * For each complexity class, f(N) is defined so that
+ *     I(N)  ≈  c · f(N) + b
+ * becomes a simple linear relationship in (f(N), I(N)) space.
  *
- * where x is a transformed version of N.
- *
- * This is useful because:
- *
- *   I ~ c
- *   I ~ c log(N)
- *   I ~ c N
- *   I ~ c N log(N)
- *   I ~ c N^2
- *   I ~ c N^3
- *   I ~ c 2^N
- *   I ~ c N!
- *
- * all become approximately linear after the appropriate transform.
+ * The additive constant b captures fixed overhead (argument
+ * parsing, stack setup, allocation bookkeeping, etc.) that does
+ * not scale with N.
  */
-static long double fitRMSE(
+static long double modelTransform(const string& model, long double N) {
+    if (model == "O(1)")        return 1.0L;
+    if (model == "O(log N)")    return logl(N);
+    if (model == "O(sqrt N)")   return sqrtl(N);
+    if (model == "O(N)")        return N;
+    if (model == "O(N log N)")  return N * logl(N);
+    if (model == "O(N^2)")      return N * N;
+    if (model == "O(N^3)")      return N * N * N;
+    if (model == "O(2^N)")      return expl(N * logl(2.0L));
+    if (model == "O(N!)")       return expl(lgammal(N + 1.0L));
+    throw runtime_error("Unknown model: " + model);
+}
+
+/*
+ * Result of fitting I(N) = c · f(N) + b  via OLS linear regression.
+ */
+struct ModelFit {
+    string     name;
+    long double r2     = -1.0L;   // R^2: fraction of variance explained
+    long double slope  = 0.0L;    // c (must be > 0 for a valid fit)
+    long double offset = 0.0L;    // b (additive constant / intercept)
+    long double nrmse  = 1e18L;   // normalized RMSE (RMSE / range of I)
+};
+
+/*
+ * Fit the model   I(N) = c · f(N) + b   using ordinary least squares
+ * in data-space (NOT log-space).
+ *
+ * This correctly handles the additive constant overhead that the
+ * old log-space fit could not:
+ *     log(c·f(N) + b) ≠ log(c) + log(f(N))  when b is significant.
+ *
+ * Returns a ModelFit with R², slope c, intercept b, and normalized RMSE.
+ */
+static ModelFit fitModel(
     const vector<Measurement>& data,
     const string& model
 ) {
-    vector<long double> x;
-    vector<long double> y;
+    ModelFit result;
+    result.name = model;
+
+    vector<long double> x;   // f(N_i)
+    vector<long double> y;   // I(N_i)
 
     for (const auto& p : data) {
         if (p.n <= 1 || p.instructions <= 0) {
@@ -120,88 +148,127 @@ static long double fitRMSE(
         }
 
         long double N = static_cast<long double>(p.n);
-        long double I = static_cast<long double>(p.instructions);
+        long double fN = modelTransform(model, N);
 
-        long double transformed = 0.0L;
-
-        if (model == "O(1)") {
-            transformed = 0.0L;
-        }
-        else if (model == "O(log N)") {
-            transformed = log(log(N));
-        }
-        else if (model == "O(sqrt N)") {
-            transformed = 0.5L * log(N);
-        }
-        else if (model == "O(N)") {
-            transformed = log(N);
-        }
-        else if (model == "O(N log N)") {
-            transformed = log(N) + log(log(N));
-        }
-        else if (model == "O(N^2)") {
-            transformed = 2.0L * log(N);
-        }
-        else if (model == "O(N^3)") {
-            transformed = 3.0L * log(N);
-        }
-        else if (model == "O(2^N)") {
-            transformed = N * log(2.0L);
-        }
-        else if (model == "O(N!)") {
-            transformed = lgammal(N + 1.0L);
-        }
-        else {
-            throw runtime_error("Unknown model: " + model);
+        // Guard against overflow for super-polynomial models at large N.
+        if (!isfinite(fN) || fN > 1e30L) {
+            continue;
         }
 
-        x.push_back(transformed);
-        y.push_back(log(I));
+        x.push_back(fN);
+        y.push_back(static_cast<long double>(p.instructions));
     }
 
-    if (x.size() < 2) {
-        return numeric_limits<long double>::infinity();
+    size_t n = x.size();
+    if (n < 2) {
+        return result;  // r2 stays -1, nrmse stays huge
     }
 
     long double xMean = mean(x);
     long double yMean = mean(y);
 
     /*
-     * Since the multiplicative constant c is unknown:
+     * OLS:   y = slope * x + offset
      *
-     * log(I) = log(c) + transformed(N)
-     *
-     * so we only fit an intercept here.
+     * slope = Σ(x_i - x̄)(y_i - ȳ) / Σ(x_i - x̄)²
      */
-    long double intercept = yMean;
-
-    long double squaredError = 0.0L;
-
-    for (size_t i = 0; i < x.size(); ++i) {
-        long double predicted = intercept + x[i] - xMean;
-        long double error = y[i] - predicted;
-        squaredError += error * error;
+    long double sxx = 0.0L, sxy = 0.0L;
+    for (size_t i = 0; i < n; ++i) {
+        long double dx = x[i] - xMean;
+        long double dy = y[i] - yMean;
+        sxx += dx * dx;
+        sxy += dx * dy;
     }
 
-    return sqrtl(squaredError / static_cast<long double>(x.size()));
+    // For O(1), all x values are 1.0 so sxx ≈ 0.  Handle specially.
+    if (model == "O(1)") {
+        // The model is I(N) = constant.  Best fit: predicted = mean(y).
+        result.slope  = 0.0L;
+        result.offset = yMean;
+
+        long double ssTotal    = 0.0L;
+        for (size_t i = 0; i < n; ++i) {
+            ssTotal += (y[i] - yMean) * (y[i] - yMean);
+        }
+
+        // Use coefficient of variation as the score.
+        // If CV is small, the data is effectively constant.
+        long double stddev = sqrtl(ssTotal / static_cast<long double>(n));
+        long double cv = (yMean > 0) ? (stddev / yMean) : 0.0L;
+
+        // Map CV to R²: perfectly constant → R²=1, high CV → R²=0.
+        // This makes O(1) comparable with other models on the same scale.
+        result.r2 = 1.0L - cv * cv * 100.0L;  // amplify CV to get meaningful R²
+        if (result.r2 < -1.0L) result.r2 = -1.0L;
+
+        result.nrmse = cv;  // normalized by mean, so comparable
+        return result;
+    }
+
+    if (fabsl(sxx) < 1e-18L) {
+        return result;  // degenerate: all x values identical
+    }
+
+    long double slope = sxy / sxx;
+    long double offset = yMean - slope * xMean;
+
+    result.slope  = slope;
+    result.offset = offset;
+
+    // Compute R² and NRMSE.
+    long double ssTotal    = 0.0L;
+    long double ssResidual = 0.0L;
+    long double yMin = y[0], yMax = y[0];
+
+    for (size_t i = 0; i < n; ++i) {
+        long double predicted = slope * x[i] + offset;
+        long double residual  = y[i] - predicted;
+
+        ssTotal    += (y[i] - yMean) * (y[i] - yMean);
+        ssResidual += residual * residual;
+        if (y[i] < yMin) yMin = y[i];
+        if (y[i] > yMax) yMax = y[i];
+    }
+
+    if (ssTotal > 1e-12L) {
+        result.r2 = 1.0L - ssResidual / ssTotal;
+
+        // Apply adjusted R² penalty: models with 2 params (slope+intercept)
+        // are penalized vs simpler models.  adj_R² = 1 - (1-R²)·(n-1)/(n-2)
+        if (n > 2) {
+            result.r2 = 1.0L - (1.0L - result.r2) *
+                        static_cast<long double>(n - 1) / static_cast<long double>(n - 2);
+        }
+    } else {
+        result.r2 = (ssResidual < 1e-12L) ? 1.0L : 0.0L;
+    }
+
+    // NRMSE: use RMSE / mean(y) to match CV-based scoring of O(1).
+    if (yMean > 0) {
+        result.nrmse = sqrtl(ssResidual / static_cast<long double>(n)) / yMean;
+    } else {
+        result.nrmse = 0.0L;
+    }
+
+    // Penalise models where the slope is negative (c < 0 is non-physical:
+    // more work at larger N should never cost fewer instructions).
+    if (slope < 0) {
+        result.r2    = -1.0L;
+        result.nrmse = 1e18L;
+    }
+
+    return result;
 }
 
+/*
+ * Power-law fit:  log I = log c + k · log N
+ *
+ * This is kept as a diagnostic / reporting tool.  The main
+ * model selection now uses fitModel() above.
+ */
 static pair<long double, long double> fitPowerLaw(
     const vector<Measurement>& data
 ) {
-    /*
-     * Assume:
-     *
-     *     I(N) ~ c * N^k
-     *
-     * Taking logs:
-     *
-     *     log I = log c + k log N
-     *
-     * So linear regression of log(I) against log(N)
-     * estimates k.
-     */
-
     vector<long double> x;
     vector<long double> y;
 
@@ -259,6 +326,21 @@ static pair<long double, long double> fitPowerLaw(
     return {k, r2};
 }
 
+/*
+ * Infer the complexity class by fitting every candidate model
+ * using data-space OLS regression:
+ *
+ *     I(N) = c · f(N) + b
+ *
+ * The model with the highest R² wins.  Ties are broken by
+ * normalised RMSE.
+ *
+ * Special handling:
+ *   - If the power-law exponent k ≈ 0, return O(1) immediately.
+ *   - Models with negative slope (c < 0) are rejected.
+ *   - Super-polynomial models (2^N, N!) that overflow for the
+ *     measured N values are gracefully skipped.
+ */
 static string inferComplexity(
     const vector<Measurement>& data,
     long double& exponent,
@@ -268,6 +350,12 @@ static string inferComplexity(
 
     exponent = k;
     r2 = powerR2;
+
+    // Fast path: if power-law exponent is near zero, the data is
+    // essentially constant.  No model selection needed.
+    if (fabsl(k) < 0.10L && powerR2 > 0.5L) {
+        return "O(1)";
+    }
 
     vector<string> models = {
         "O(1)",
@@ -281,20 +369,23 @@ static string inferComplexity(
         "O(N!)"
     };
 
-    vector<FitResult> fits;
+    vector<ModelFit> fits;
 
     for (const string& model : models) {
-        fits.push_back({
-            model,
-            fitRMSE(data, model)
-        });
+        fits.push_back(fitModel(data, model));
     }
 
+    // Sort by R² descending, then by NRMSE ascending to break ties.
     sort(
         fits.begin(),
         fits.end(),
-        [](const FitResult& a, const FitResult& b) {
-            return a.rmse < b.rmse;
+        [](const ModelFit& a, const ModelFit& b) {
+            // Higher R² is better.  If within 0.005 of each other,
+            // break tie by lower NRMSE.
+            if (fabsl(a.r2 - b.r2) > 0.005L) {
+                return a.r2 > b.r2;
+            }
+            return a.nrmse < b.nrmse;
         }
     );
 

@@ -1,6 +1,7 @@
 // O(N^3) — Floyd-Warshall all-pairs shortest paths
+//
+// Run with smaller N values to avoid timeout: --ns 32,64,128,256,512
 #include <cstdlib>
-#include <climits>
 
 volatile int sink;
 

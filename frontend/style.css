@@ -1,0 +1,872 @@
+/* ==========================================================================
+   THE JUDGE — Complexity Profiler
+   Engineered Technical Interface (Vercel / Geist Design System)
+   Typography: Geist Sans & Geist Mono
+   Palette: High-Contrast Monochromatic Carbon / Zinc
+   ========================================================================== */
+
+:root {
+  /* High-Contrast Neutral Scale (No generic blue-gray AI tones) */
+  --bg-page: #000000;
+  --bg-surface: #0c0c0e;
+  --bg-subtle: #141417;
+  --bg-hover: #1c1c21;
+  --bg-active: #24242b;
+
+  /* Crisp Hairline Borders */
+  --border: #222227;
+  --border-strong: #38383f;
+  --border-focus: #ffffff;
+
+  /* Typography Colors */
+  --text-primary: #ededed;
+  --text-secondary: #8a8a93;
+  --text-muted: #55555c;
+
+  /* Typography Families */
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+
+  /* Geometry: Sharp, professional, zero rounded pill capsules */
+  --radius: 5px;
+  --radius-sm: 3px;
+
+  /* Transitions */
+  --transition: all 0.12s ease;
+}
+
+/* ==========================================================================
+   Reset & Base Styles
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 14px;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+}
+
+code, pre, kbd {
+  font-family: var(--font-mono);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a30;
+  border-radius: var(--radius-sm);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3e3e46;
+}
+
+/* ==========================================================================
+   Navbar (Clean, understated, zero glowing dots)
+   ========================================================================== */
+.navbar {
+  border-bottom: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.brand-title {
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.brand-divider {
+  color: var(--text-muted);
+}
+
+.brand-subtitle {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-item {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 14px 0;
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition);
+  border-bottom: 2px solid transparent;
+}
+
+.nav-item:hover {
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  color: #ffffff;
+  border-bottom-color: #ffffff;
+}
+
+.system-status {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   Viewport Container
+   ========================================================================== */
+.viewport {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 24px 64px 24px;
+  flex: 1;
+}
+
+.tab-view {
+  display: none;
+}
+
+.tab-view.active {
+  display: block;
+}
+
+/* ==========================================================================
+   Presets Strip (Clean rectangular buttons, zero capsules)
+   ========================================================================== */
+.preset-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.preset-strip-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.preset-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.preset-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.preset-btn.active {
+  background: var(--bg-subtle);
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.preset-btn code {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.preset-btn.active code {
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   Workbench (Controls Toolbar + Code Editor)
+   ========================================================================== */
+.workbench {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.workbench-bar {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr 1.2fr auto;
+  gap: 20px;
+  align-items: end;
+  background: var(--bg-surface);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.size-shortcuts {
+  display: flex;
+  gap: 4px;
+}
+
+.size-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.size-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.size-btn.active {
+  background: var(--bg-hover);
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.input {
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: var(--radius);
+  outline: none;
+  transition: var(--transition);
+}
+
+.input:focus {
+  border-color: var(--border-focus);
+}
+
+.select {
+  cursor: pointer;
+}
+
+.action-wrap {
+  display: flex;
+  align-items: flex-end;
+}
+
+.primary-btn {
+  height: 36px;
+  padding: 0 18px;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.primary-btn:hover {
+  background: #e4e4e7;
+}
+
+.primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  color: rgba(0, 0, 0, 0.7);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top-color: #000000;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Editor */
+.editor-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-topbar {
+  padding: 8px 18px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.editor-file {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.editor-hint {
+  color: var(--text-muted);
+}
+
+.editor-hint code {
+  color: var(--text-secondary);
+}
+
+.code-area {
+  width: 100%;
+  height: 280px;
+  background: var(--bg-page);
+  border: none;
+  color: #f4f4f5;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 16px 18px;
+  outline: none;
+  resize: vertical;
+  tab-size: 4;
+}
+
+/* ==========================================================================
+   Verdict Banner (Clean, authoritative, zero text bloat)
+   ========================================================================== */
+.verdict-banner {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  padding: 22px 28px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.verdict-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.verdict-class {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.verdict-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.verdict-summary {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.verdict-data {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.data-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.data-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+.data-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.data-value.mono {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  margin-top: 3px;
+}
+
+/* ==========================================================================
+   Evidence Grid: Chart & Table Panels
+   ========================================================================== */
+.evidence-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.panel-meta {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.scale-toggle {
+  display: flex;
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1px;
+}
+
+.toggle-opt {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.toggle-opt:hover {
+  color: var(--text-primary);
+}
+
+.toggle-opt.active {
+  background: var(--bg-hover);
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.chart-body {
+  padding: 18px;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#growthChart {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+/* Table Ledger */
+.table-body {
+  padding: 0;
+}
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.ledger thead {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-page);
+}
+
+.ledger th {
+  padding: 9px 18px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.ledger th.num, .ledger td.num {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.ledger tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: var(--transition);
+}
+
+.ledger tbody tr:last-child {
+  border-bottom: none;
+}
+
+.ledger tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.ledger td {
+  padding: 11px 18px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.ledger td.bold {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.ledger td.muted {
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Trace Disclosure
+   ========================================================================== */
+.trace-panel {
+  margin-bottom: 24px;
+}
+
+.trace-details summary {
+  padding: 12px 18px;
+  background: var(--bg-subtle);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.trace-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.trace-details summary:hover {
+  color: var(--text-primary);
+}
+
+.copy-btn {
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.copy-btn:hover {
+  background: var(--bg-hover);
+  color: #ffffff;
+  border-color: var(--border-strong);
+}
+
+.trace-box {
+  padding: 16px 18px;
+  background: var(--bg-page);
+  border-top: 1px solid var(--border);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.trace-pre {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.55;
+  color: #d4d4d8;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ==========================================================================
+   Tab 2: Benchmark Suite
+   ========================================================================== */
+.suite-header {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.suite-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.suite-stats {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.suite-stats strong {
+  color: #ffffff;
+}
+
+.suite-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+}
+
+.status-pass {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.status-fail {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Tab 3: Methodology Documentation
+   ========================================================================== */
+.doc-container {
+  max-width: 840px;
+}
+
+.doc-title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: 24px;
+}
+
+.doc-section {
+  margin-bottom: 32px;
+}
+
+.doc-section h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+.doc-section p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.doc-section p strong {
+  color: var(--text-primary);
+}
+
+.doc-table {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.doc-table th, .doc-table td {
+  padding: 10px 16px;
+}
+
+/* ==========================================================================
+   Modal
+   ========================================================================== */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-dialog {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 800px;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 14px 18px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #ffffff;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.modal-close:hover {
+  color: #ffffff;
+}
+
+.modal-body {
+  padding: 18px;
+  background: var(--bg-page);
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 960px) {
+  .workbench-bar {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .verdict-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .evidence-grid {
+    grid-template-columns: 1fr;
+  }
+  .suite-grid {
+    grid-template-columns: 1fr;
+  }
+}

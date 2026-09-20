@@ -94,36 +94,36 @@ Measurement:
   Optimization: -O0
 
 Compiling target...
-  $ g++ -O0 -g -fno-omit-frame-pointer '/home/krish/Documents/Projects/THE_JUDGE/programs/2n/1.cc' -o '/tmp/complexity_profiler_34938/target' 2>&1
+  $ g++ -O0 -g -fno-omit-frame-pointer '/home/krish/Documents/Projects/THE_JUDGE/programs/2n/1.cc' -o '/tmp/complexity_profiler_45827/target' 2>&1
 
 Running measurements...
 
 N = 64
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_34938/callgrind_64.out' '/tmp/complexity_profiler_34938/target' 64 > /dev/null 2>&1
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_45827/callgrind_64.out' '/tmp/complexity_profiler_45827/target' 64 > /dev/null 2>&1
   Instructions = 1745
 
 N = 128
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_34938/callgrind_128.out' '/tmp/complexity_profiler_34938/target' 128 > /dev/null 2>&1
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_45827/callgrind_128.out' '/tmp/complexity_profiler_45827/target' 128 > /dev/null 2>&1
   Instructions = 2532
 
 N = 256
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_34938/callgrind_256.out' '/tmp/complexity_profiler_34938/target' 256 > /dev/null 2>&1
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_45827/callgrind_256.out' '/tmp/complexity_profiler_45827/target' 256 > /dev/null 2>&1
   Instructions = 4068
 
 N = 512
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_34938/callgrind_512.out' '/tmp/complexity_profiler_34938/target' 512 > /dev/null 2>&1
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_45827/callgrind_512.out' '/tmp/complexity_profiler_45827/target' 512 > /dev/null 2>&1
   Instructions = 7140
 
 N = 1024
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_34938/callgrind_1024.out' '/tmp/complexity_profiler_34938/target' 1024 > /dev/null 2>&1
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_45827/callgrind_1024.out' '/tmp/complexity_profiler_45827/target' 1024 > /dev/null 2>&1
   Instructions = 13303
 
 N = 2048
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_34938/callgrind_2048.out' '/tmp/complexity_profiler_34938/target' 2048 > /dev/null 2>&1
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_45827/callgrind_2048.out' '/tmp/complexity_profiler_45827/target' 2048 > /dev/null 2>&1
   Instructions = 25591
 
 N = 4096
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_34938/callgrind_4096.out' '/tmp/complexity_profiler_34938/target' 4096 > /dev/null 2>&1
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_45827/callgrind_4096.out' '/tmp/complexity_profiler_45827/target' 4096 > /dev/null 2>&1
   Instructions = 50167
 
 
@@ -158,7 +158,7 @@ Interpretation:
   Growth is approximately linear.
 
 Temporary files:
-  /tmp/complexity_profiler_34938
+  /tmp/complexity_profiler_45827
 
 NOTE:
   This is an empirical estimate, not a mathematical proof.

@@ -5,9 +5,9 @@
   Source file        : /home/krish/Documents/Projects/THE_JUDGE/programs/n/0.cc
   Folder             : n
   Expected (truth)   : O(N)
-  Analyzer answered  : O(sqrt N)
-  Result             : FAIL
-  Time taken         : 2.7 s
+  Analyzer answered  : O(N)
+  Result             : PASS
+  Time taken         : 2.6 s
   N values requested : 0 (base case), 64, 128, 256, 512, 1024, 2048, 4096
 
 ------------------------------------------------------------------------------
@@ -21,13 +21,13 @@
           N               IR       IR - IR(0)         delta IR     ratio  expected     dev %  local k
   -----------------------------------------------------------------------------------------------------
    0 (base)              935                0                -         -         -         -        -
-         64            1,406              471              471         -         -         -        -
-        128            1,873              938              467     1.332     2.000     -33.4    0.414
-        256            2,769            1,834              896     1.478     2.000     -26.1    0.564
-        512            4,561            3,626            1,792     1.647     2.000     -17.6    0.720
-       1024            8,164            7,229            3,603     1.790     2.000     -10.5    0.840
-       2048           15,332           14,397            7,168     1.878     2.000      -6.1    0.909
-       4096           29,668           28,733           14,336     1.935     2.000      -3.2    0.952
+         64            2,432            1,497            1,497         -         -         -        -
+        128            3,923            2,988            1,491     1.613     2.000     -19.3    0.690
+        256            6,867            5,932            2,944     1.750     2.000     -12.5    0.808
+        512           12,755           11,820            5,888     1.857     2.000      -7.1    0.893
+       1024           24,550           23,615           11,795     1.925     2.000      -3.8    0.945
+       2048           48,102           47,167           23,552     1.959     2.000      -2.0    0.970
+       4096           95,206           94,271           47,104     1.979     2.000      -1.0    0.985
 
   Legend:
     IR - IR(0) : instructions above the N = 0 base case (fixed overhead removed)
@@ -43,35 +43,35 @@
 ------------------------------------------------------------------------------
           N           IR/N   IR/(N*log2N)         IR/N^2             IR/[N]
   --------------------------------------------------------------------------
-         64         21.969         3.6615        0.34326             21.969
-        128         14.633         2.0904        0.11432             14.633
-        256         10.816         1.3521       0.042252             10.816
-        512         8.9082         0.9898       0.017399             8.9082
-       1024         7.9727        0.79727      0.0077858             7.9727
-       2048         7.4863        0.68058      0.0036554             7.4863
-       4096         7.2432         0.6036      0.0017684             7.2432
+         64             38         6.3333        0.59375                 38
+        128         30.648         4.3783        0.23944             30.648
+        256         26.824          3.353        0.10478             26.824
+        512         24.912          2.768       0.048656             24.912
+       1024         23.975         2.3975       0.023413             23.975
+       2048         23.487         2.1352       0.011468             23.487
+       4096         23.244          1.937      0.0056747             23.244
 
-  Flatness of IR/[N] over the last 4 points: max/min = 1.230   (1.000 = perfectly flat = the expected class fits well)
+  Flatness of IR/[N] over the last 4 points: max/min = 1.072   (1.000 = perfectly flat = the expected class fits well)
 
 ------------------------------------------------------------------------------
  4. GROWTH SUMMARY
 ------------------------------------------------------------------------------
   Base case IR(0)                     : 935
   N range                             : 64 -> 4096  (x64.0)
-  IR growth over that range           : x21.101
+  IR growth over that range           : x39.147
   Growth a pure O(N) would show       : x64.000
-  Geometric-mean step ratio           : 1.662
-  Overall log-log slope               : 0.733
-  Analyzer power-law exponent k       : 0.7437
-  Analyzer power-law R^2              : 0.9832
-  Analyzer interpretation             : Growth does not closely match a simple integer-degree polynomial.
+  Geometric-mean step ratio           : 1.843
+  Overall log-log slope               : 0.882
+  Analyzer power-law exponent k       : 0.8908
+  Analyzer power-law R^2              : 0.9967
+  Analyzer interpretation             : Growth is approximately linear.
 
 ------------------------------------------------------------------------------
  5. FINAL VERDICT
 ------------------------------------------------------------------------------
   Expected : O(N)
-  Got      : O(sqrt N)
-  Verdict  : WRONG
+  Got      : O(N)
+  Verdict  : CORRECT
 
 ------------------------------------------------------------------------------
  RAW ANALYZER OUTPUT
@@ -94,37 +94,37 @@ Measurement:
   Optimization: -O0
 
 Compiling target...
-  $ g++ -O0 -g -fno-omit-frame-pointer '/home/krish/Documents/Projects/THE_JUDGE/programs/n/0.cc' -o '/tmp/complexity_profiler_31687/target' 2>&1
+  $ g++ -O0 -g -fno-omit-frame-pointer '/home/krish/Documents/Projects/THE_JUDGE/programs/n/0.cc' -o '/tmp/complexity_profiler_41318/target' 2>&1
 
 Running measurements...
 
 N = 64
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_31687/callgrind_64.out' '/tmp/complexity_profiler_31687/target' 64 > /dev/null 2>&1
-  Instructions = 1406
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_41318/callgrind_64.out' '/tmp/complexity_profiler_41318/target' 64 > /dev/null 2>&1
+  Instructions = 2432
 
 N = 128
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_31687/callgrind_128.out' '/tmp/complexity_profiler_31687/target' 128 > /dev/null 2>&1
-  Instructions = 1873
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_41318/callgrind_128.out' '/tmp/complexity_profiler_41318/target' 128 > /dev/null 2>&1
+  Instructions = 3923
 
 N = 256
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_31687/callgrind_256.out' '/tmp/complexity_profiler_31687/target' 256 > /dev/null 2>&1
-  Instructions = 2769
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_41318/callgrind_256.out' '/tmp/complexity_profiler_41318/target' 256 > /dev/null 2>&1
+  Instructions = 6867
 
 N = 512
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_31687/callgrind_512.out' '/tmp/complexity_profiler_31687/target' 512 > /dev/null 2>&1
-  Instructions = 4561
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_41318/callgrind_512.out' '/tmp/complexity_profiler_41318/target' 512 > /dev/null 2>&1
+  Instructions = 12755
 
 N = 1024
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_31687/callgrind_1024.out' '/tmp/complexity_profiler_31687/target' 1024 > /dev/null 2>&1
-  Instructions = 8164
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_41318/callgrind_1024.out' '/tmp/complexity_profiler_41318/target' 1024 > /dev/null 2>&1
+  Instructions = 24550
 
 N = 2048
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_31687/callgrind_2048.out' '/tmp/complexity_profiler_31687/target' 2048 > /dev/null 2>&1
-  Instructions = 15332
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_41318/callgrind_2048.out' '/tmp/complexity_profiler_41318/target' 2048 > /dev/null 2>&1
+  Instructions = 48102
 
 N = 4096
-  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_31687/callgrind_4096.out' '/tmp/complexity_profiler_31687/target' 4096 > /dev/null 2>&1
-  Instructions = 29668
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_41318/callgrind_4096.out' '/tmp/complexity_profiler_41318/target' 4096 > /dev/null 2>&1
+  Instructions = 95206
 
 
 ========================================
@@ -133,32 +133,32 @@ N = 4096
 
 N              Instructions        I(2N)/I(N)          
 -------------------------------------------------------
-64             1406                -                   
-128            1873                1.332               
-256            2769                1.478               
-512            4561                1.647               
-1024           8164                1.790               
-2048           15332               1.878               
-4096           29668               1.935               
+64             2432                -                   
+128            3923                1.613               
+256            6867                1.750               
+512            12755               1.857               
+1024           24550               1.925               
+2048           48102               1.959               
+4096           95206               1.979               
 
 ========================================
                 Analysis
 ========================================
 
 Estimated power-law exponent:
-  k = 0.7437
+  k = 0.8908
 
 Power-law R^2:
-  0.9832
+  0.9967
 
 Likely time complexity:
-  O(sqrt N)
+  O(N)
 
 Interpretation:
-  Growth does not closely match a simple integer-degree polynomial.
+  Growth is approximately linear.
 
 Temporary files:
-  /tmp/complexity_profiler_31687
+  /tmp/complexity_profiler_41318
 
 NOTE:
   This is an empirical estimate, not a mathematical proof.
