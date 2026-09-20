@@ -1,0 +1,91 @@
+
+========================================
+     Empirical Complexity Profiler
+========================================
+
+Source:
+  /home/krish/Documents/Projects/THE_JUDGE/helloworld.c
+
+Compiler:
+  gcc
+
+Measurement:
+  Callgrind event: Ir (executed instructions)
+  Collection starts at main()
+  Startup/runtime overhead is excluded as much as Callgrind permits
+  Optimization: -O0
+
+Compiling target...
+  $ gcc -O0 -g -fno-omit-frame-pointer '/home/krish/Documents/Projects/THE_JUDGE/helloworld.c' -o '/tmp/complexity_profiler_20336/target' 2>&1
+
+Running measurements...
+
+N = 128
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_20336/callgrind_128.out' '/tmp/complexity_profiler_20336/target' 128 > /dev/null 2>&1
+  Instructions = 1686
+
+N = 256
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_20336/callgrind_256.out' '/tmp/complexity_profiler_20336/target' 256 > /dev/null 2>&1
+  Instructions = 1686
+
+N = 512
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_20336/callgrind_512.out' '/tmp/complexity_profiler_20336/target' 512 > /dev/null 2>&1
+  Instructions = 1686
+
+N = 1024
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_20336/callgrind_1024.out' '/tmp/complexity_profiler_20336/target' 1024 > /dev/null 2>&1
+  Instructions = 1686
+
+N = 2048
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_20336/callgrind_2048.out' '/tmp/complexity_profiler_20336/target' 2048 > /dev/null 2>&1
+  Instructions = 1686
+
+N = 4096
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_20336/callgrind_4096.out' '/tmp/complexity_profiler_20336/target' 4096 > /dev/null 2>&1
+  Instructions = 1686
+
+N = 8192
+  $ valgrind --tool=callgrind --collect-atstart=no --toggle-collect=main --callgrind-out-file='/tmp/complexity_profiler_20336/callgrind_8192.out' '/tmp/complexity_profiler_20336/target' 8192 > /dev/null 2>&1
+  Instructions = 1686
+
+
+========================================
+              Measurements
+========================================
+
+N              Instructions        I(2N)/I(N)          
+-------------------------------------------------------
+128            1686                -                   
+256            1686                1.000               
+512            1686                1.000               
+1024           1686                1.000               
+2048           1686                1.000               
+4096           1686                1.000               
+8192           1686                1.000               
+
+========================================
+                Analysis
+========================================
+
+Estimated power-law exponent:
+  k = 0.0000
+
+Power-law R^2:
+  0.0000
+
+Likely time complexity:
+  O(1)
+
+Interpretation:
+  Instruction count is approximately constant.
+
+Temporary files:
+  /tmp/complexity_profiler_20336
+
+NOTE:
+  This is an empirical estimate, not a mathematical proof.
+  The program must actually use N in a meaningful way.
+  Library calls made by the program are included while main()
+  is being profiled, which is important for operations such as sort().
+
+Done.
