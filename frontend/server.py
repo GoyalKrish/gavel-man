@@ -243,21 +243,35 @@ class JudgeApiHandler(http.server.SimpleHTTPRequestHandler):
             if not n_args:
                 n_args = ["64", "128", "256", "512"]
 
-            # If program_path is given and valid, analyze it directly
+            # Prioritize custom code from the editor if provided
             temp_file_to_clean = None
-            if program_path:
+            if code and code.strip():
+                # Write custom code to a unique temporary file.
+                # tempfile.mkstemp() always uses /tmp on Lambda (the only
+                # writable location). We verify the file exists and has
+                # content before handing it off to the profiler binary.
+                fd, temp_src = tempfile.mkstemp(suffix=".cc", prefix="judge_custom_")
+                try:
+                    with os.fdopen(fd, "w", encoding="utf-8") as f:
+                        f.write(code)
+                except OSError as e:
+                    self.send_json({"error": f"Failed to write custom code to /tmp: {e}. Check Lambda /tmp permissions or disk space."}, status=500)
+                    return
+                # Sanity-check: the file must exist and be non-empty.
+                if not os.path.isfile(temp_src) or os.path.getsize(temp_src) == 0:
+                    self.send_json({"error": "Temporary source file could not be created in /tmp. Ensure the Lambda function has write access to /tmp."}, status=500)
+                    return
+                source_file = temp_src
+                temp_file_to_clean = temp_src
+            elif program_path:
                 safe_prog = os.path.normpath(program_path).lstrip("./\\")
                 source_file = os.path.join(PROGRAMS_DIR, safe_prog)
                 if not (os.path.commonpath([source_file, PROGRAMS_DIR]) == PROGRAMS_DIR and os.path.isfile(source_file)):
                     self.send_json({"error": f"Program not found: {safe_prog}"}, status=404)
                     return
             else:
-                # Write custom code to temporary file
-                fd, temp_src = tempfile.mkstemp(suffix=".cc", prefix="judge_custom_")
-                with os.fdopen(fd, "w", encoding="utf-8") as f:
-                    f.write(code)
-                source_file = temp_src
-                temp_file_to_clean = temp_src
+                self.send_json({"error": "Either 'code' or 'program_path' must be provided."}, status=400)
+                return
 
             try:
                 cmd = [PROFILER_BIN, source_file] + n_args
@@ -268,9 +282,23 @@ class JudgeApiHandler(http.server.SimpleHTTPRequestHandler):
                     text=True,
                     timeout=180
                 )
-                output = proc.stdout + "\n" + proc.stderr
+                output = (proc.stdout or "") + "\n" + (proc.stderr or "")
                 parsed_res = parse_profiler_output(output)
                 parsed_res["exit_code"] = proc.returncode
+
+                # If profiler exited with an error or returned no measurements, provide actionable diagnostic
+                if proc.returncode != 0 or not parsed_res.get("measurements"):
+                    if "Compilation failed" in output or "error:" in output:
+                        parsed_res["error"] = "Compilation failed. Check C++ syntax, types, and included headers."
+                    elif "Not enough successful measurements" in output:
+                        parsed_res["error"] = "Execution failed under Valgrind. Ensure your code accepts N as argv[1] and returns 0 from main()."
+                    elif "Unsupported source extension" in output:
+                        parsed_res["error"] = "Unsupported source extension. Must be C or C++ (.c, .cc, .cpp)."
+                    elif "Failed to create temporary directory" in output:
+                        parsed_res["error"] = "Profiler could not create a temp directory in /tmp. Lambda /tmp may be full or restricted."
+                    else:
+                        parsed_res["error"] = "Analysis incomplete. Check Valgrind Callgrind Output below for details."
+
                 self.send_json(parsed_res)
             except subprocess.TimeoutExpired:
                 self.send_json({"error": "Analysis timed out (180s limit)."}, status=504)

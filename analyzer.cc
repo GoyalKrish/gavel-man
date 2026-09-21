@@ -12,6 +12,9 @@
 #include <vector>
 #include <unistd.h>
 #include <iostream>
+#include <cerrno>
+#include <cstring>
+#include <sys/stat.h>
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -491,12 +494,24 @@ Example target program:
 
         /*
          * Temporary working directory.
+         *
+         * Use mkdtemp() instead of a PID-based path so we always get a
+         * fresh, unique directory.  This is critical on AWS Lambda where
+         * containers are re-used across invocations: the old PID-named
+         * directory may already exist (or fail to create) causing every
+         * subsequent custom-code run to silently fall back to an error
+         * with no Callgrind output.
          */
-        string tempDir =
-            "/tmp/complexity_profiler_" +
-            to_string(static_cast<long long>(getpid()));
-
-        fs::create_directories(tempDir);
+        char tempDirTemplate[] = "/tmp/complexity_profiler_XXXXXX";
+        char* tempDirPtr = mkdtemp(tempDirTemplate);
+        if (tempDirPtr == nullptr) {
+            throw runtime_error(
+                string("Failed to create temporary directory in /tmp: ") +
+                strerror(errno) +
+                ". Ensure /tmp is writable (required on AWS Lambda)."
+            );
+        }
+        string tempDir(tempDirPtr);
 
         string executable = tempDir + "/target";
 
@@ -537,6 +552,14 @@ Example target program:
 
         if (!runCommand(compileCommand)) {
             throw runtime_error("Compilation failed.");
+        }
+
+        // Ensure the compiled binary is executable.
+        // On some Lambda environments the umask or filesystem flags
+        // may strip the execute bit after compilation.
+        if (chmod(executable.c_str(), 0755) != 0) {
+            cerr << "  WARNING: chmod +x failed for compiled binary: "
+                 << strerror(errno) << "\n";
         }
 
         cout << "\n";

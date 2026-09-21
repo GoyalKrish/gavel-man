@@ -9,6 +9,7 @@ const state = {
   programs: {},
   currentProgramPath: 'nn/0.cc',
   isAnalyzing: false,
+  isProgrammaticCodeChange: false,
   chartScale: 'linear', // 'linear' or 'log'
   lastMeasurements: [],
   serverOnline: false,
@@ -26,18 +27,20 @@ const presetLibrary = {
     filename: 'programs/nn/0.cc',
     nDefault: '64, 128, 256, 512',
     code: `// Quadratic Bubble Sort Benchmark (O(N²))
-#include <iostream>
-#include <vector>
 #include <cstdlib>
+
+volatile int sink;
 
 int main(int argc, char* argv[]) {
     int n = argc > 1 ? std::atoi(argv[1]) : 256;
-    std::vector<int> arr(n);
+    if (n <= 0) return 0;
+
+    int* arr = new int[n];
     for (int i = 0; i < n; ++i) arr[i] = n - i;
 
     // Nested loops yielding N*(N-1)/2 comparisons
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n - 1; ++j) {
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = 0; j < n - 1 - i; ++j) {
             if (arr[j] > arr[j + 1]) {
                 int temp = arr[j];
                 arr[j] = arr[j + 1];
@@ -45,7 +48,9 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-    return arr[0];
+    sink = arr[0];
+    delete[] arr;
+    return 0;
 }
 `,
     sampleResult: {
@@ -84,20 +89,25 @@ Final Classification: O(N^2) (Quadratic)`
     filename: 'programs/n/0.cc',
     nDefault: '1024, 2048, 4096, 8192',
     code: `// Linear Accumulation Benchmark (O(N))
-#include <iostream>
-#include <vector>
 #include <cstdlib>
+
+volatile long long sink;
 
 int main(int argc, char* argv[]) {
     int n = argc > 1 ? std::atoi(argv[1]) : 1000;
-    std::vector<int> arr(n, 1);
-    long long sum = 0;
+    if (n <= 0) return 0;
 
-    // Single linear loop
+    long long sum = 0;
+    long long a = 1, b = 1;
     for (int i = 0; i < n; ++i) {
-        sum += arr[i];
+        long long c = a + b;
+        a = b;
+        b = c;
+        sum += c ^ (c >> 3);
+        sum += (c * 31 + 17) & 0xFFFF;
     }
-    return static_cast<int>(sum % 100);
+    sink = sum;
+    return 0;
 }
 `,
     sampleResult: {
@@ -129,25 +139,26 @@ Final Classification: O(N) (Linear)`
     complexityDisplay: 'O(log N)',
     filename: 'programs/logn/0.cc',
     nDefault: '512, 1024, 2048, 4096, 8192',
-    code: `// Binary Search Benchmark (O(log N))
-#include <iostream>
-#include <vector>
+    code: `// Repeated Halving Benchmark (O(log N))
 #include <cstdlib>
 
-int main(int argc, char* argv[]) {
-    int n = argc > 1 ? std::atoi(argv[1]) : 1024;
-    std::vector<int> arr(n);
-    for (int i = 0; i < n; ++i) arr[i] = i * 2;
+volatile long long sink;
 
-    int target = n - 1;
-    int low = 0, high = n - 1, ans = -1;
-    while (low <= high) {
-        int mid = low + (high - low) / 2;
-        if (arr[mid] == target) { ans = mid; break; }
-        if (arr[mid] < target) low = mid + 1;
-        else high = mid - 1;
+int main(int argc, char* argv[]) {
+    long long n = argc > 1 ? std::atoll(argv[1]) : 1024;
+    if (n <= 0) return 0;
+
+    const int REPS = 5000;
+    long long total = 0;
+    for (int r = 0; r < REPS; ++r) {
+        long long v = n;
+        while (v > 0) {
+            total += v;
+            v >>= 1;
+        }
     }
-    return ans;
+    sink = total;
+    return 0;
 }
 `,
     sampleResult: {
@@ -182,25 +193,38 @@ Final Classification: O(log N) (Logarithmic)`
     filename: 'programs/nnn/0.cc',
     nDefault: '32, 64, 128',
     code: `// Cubic Matrix Multiplication Benchmark (O(N³))
-#include <iostream>
-#include <vector>
 #include <cstdlib>
+
+volatile long long sink;
 
 int main(int argc, char* argv[]) {
     int n = argc > 1 ? std::atoi(argv[1]) : 64;
-    std::vector<std::vector<int>> A(n, std::vector<int>(n, 1));
-    std::vector<std::vector<int>> B(n, std::vector<int>(n, 2));
-    std::vector<std::vector<int>> C(n, std::vector<int>(n, 0));
+    if (n <= 0) return 0;
 
-    // Triply nested loops
+    long long* A = new long long[n * n];
+    long long* B = new long long[n * n];
+    long long* C = new long long[n * n];
+
+    for (int i = 0; i < n * n; ++i) {
+        A[i] = i % 17 + 1;
+        B[i] = (i * 3) % 13 + 1;
+        C[i] = 0;
+    }
+
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            for (int k = 0; k < n; ++k) {
-                C[i][j] += A[i][k] * B[k][j];
-            }
+            long long s = 0;
+            for (int k = 0; k < n; ++k)
+                s += A[i * n + k] * B[k * n + j];
+            C[i * n + j] = s;
         }
     }
-    return C[0][0];
+
+    sink = C[0];
+    delete[] A;
+    delete[] B;
+    delete[] C;
+    return 0;
 }
 `,
     sampleResult: {
@@ -231,17 +255,21 @@ Final Classification: O(N^3) (Cubic)`
     filename: 'programs/2n/0.cc',
     nDefault: '16, 18, 20, 22',
     code: `// Exponential Recursive Branching Benchmark (O(2ᴺ))
-#include <iostream>
 #include <cstdlib>
 
-long long fib(int n) {
+volatile long long sink;
+
+static long long fib(int n) {
     if (n <= 1) return n;
     return fib(n - 1) + fib(n - 2);
 }
 
 int main(int argc, char* argv[]) {
     int n = argc > 1 ? std::atoi(argv[1]) : 20;
-    return static_cast<int>(fib(n) % 100);
+    if (n <= 0) return 0;
+
+    sink = fib(n);
+    return 0;
 }
 `,
     sampleResult: {
@@ -334,6 +362,16 @@ function setupCodeMirror() {
     });
 
     codeMirrorEditor.setSize('100%', '320px');
+
+    codeMirrorEditor.on('change', () => {
+      if (state.isProgrammaticCodeChange) return;
+      handleUserCodeEdit();
+    });
+  } else if (codeArea) {
+    codeArea.addEventListener('input', () => {
+      if (state.isProgrammaticCodeChange) return;
+      handleUserCodeEdit();
+    });
   }
 
   const presetSelect = document.getElementById('presetSelect');
@@ -347,6 +385,19 @@ function setupCodeMirror() {
         await loadProgramSource(path);
       }
     });
+  }
+}
+
+function handleUserCodeEdit() {
+  state.currentProgramPath = null;
+  const filenameLabel = document.getElementById('editorFilename');
+  if (filenameLabel) {
+    filenameLabel.textContent = 'custom.cc';
+  }
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  const select = document.getElementById('presetSelect');
+  if (select) {
+    select.value = '';
   }
 }
 
@@ -428,7 +479,10 @@ function loadPresetData(presetKey) {
   const nInput = document.getElementById('nValuesInput');
   const select = document.getElementById('presetSelect');
 
+  state.isProgrammaticCodeChange = true;
   setCodeContent(preset.code);
+  state.isProgrammaticCodeChange = false;
+
   if (filenameLabel) filenameLabel.textContent = preset.filename;
   if (nInput) nInput.value = preset.nDefault;
   if (select) select.value = presetKey;
@@ -575,7 +629,10 @@ async function loadProgramSource(path) {
     const filenameLabel = document.getElementById('editorFilename');
     const select = document.getElementById('presetSelect');
 
+    state.isProgrammaticCodeChange = true;
     setCodeContent(data.code);
+    state.isProgrammaticCodeChange = false;
+
     if (filenameLabel) filenameLabel.textContent = path;
     if (select) select.value = path;
 
@@ -629,8 +686,11 @@ async function executeAnalysis() {
 
   if (!state.serverOnline) {
     setTimeout(() => {
-      const preset = presetLibrary[state.currentProgramPath] || presetLibrary['nn/0.cc'];
-      updateResults(preset.sampleResult);
+      if (state.currentProgramPath && presetLibrary[state.currentProgramPath]) {
+        updateResults(presetLibrary[state.currentProgramPath].sampleResult);
+      } else {
+        alert('Backend server is offline. Run python3 frontend/server.py or deploy container to analyze custom code.');
+      }
       setAnalyzingState(false);
     }, 400);
     return;
@@ -640,7 +700,7 @@ async function executeAnalysis() {
     const payload = {
       code: code,
       nValues: nValues,
-      program_path: state.currentProgramPath
+      program_path: state.currentProgramPath || null
     };
 
     const res = await fetch('/api/analyze', {
@@ -650,7 +710,7 @@ async function executeAnalysis() {
     });
 
     if (!res.ok) {
-      const errData = await res.json();
+      const errData = await res.json().catch(() => ({}));
       throw new Error(errData.error || `Server responded with ${res.status}`);
     }
 
@@ -683,6 +743,24 @@ function updateResults(data) {
   const r2El = document.getElementById('metricR2');
   const interpEl = document.getElementById('verdictInterpretation');
   const consoleEl = document.getElementById('consoleLog');
+
+  if (data.error) {
+    if (complexityEl) complexityEl.textContent = 'Error';
+    if (badgeEl) badgeEl.textContent = 'Analysis Failed';
+    if (exponentEl) exponentEl.textContent = '—';
+    if (r2El) r2El.textContent = '—';
+    if (interpEl) interpEl.textContent = data.error;
+    if (consoleEl) consoleEl.textContent = data.raw_output || data.error;
+
+    // Automatically expand the trace details so user can see compiler / Valgrind errors
+    const traceDetails = document.querySelector('.trace-details');
+    if (traceDetails) traceDetails.open = true;
+
+    renderMeasurementsTable([]);
+    state.lastMeasurements = [];
+    renderChart();
+    return;
+  }
 
   if (complexityEl) {
     complexityEl.textContent = data.complexity || 'Unknown';
